@@ -1,0 +1,14 @@
+{
+    "c1": {
+        "name": "Bitcoin",
+        "symbol": "BTC",
+        "value": 0,
+        "href": "/crypto/currency-pairs?c1=189&c2=12"
+    },
+    "c2": {
+        "name": "Stellar",
+        "symbol": "XLM",
+        "value": 0,
+        "href": "/crypto/currency-pairs?c1=229&c2=12"
+    }
+}
