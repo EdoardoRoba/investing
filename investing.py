@@ -56,7 +56,7 @@ def add_new_crypto(url,headers,i):
         existing = json.load(open("data.json"))
     return existing
 
-#chck the old csv file: if new cryptos are added to json, they are added to csv as well
+#check the old csv file: if new cryptos are added to json, they are added to csv as well
 def check_old_value(fileName,json_file):
     cryptos = []
     for j in json_file:
@@ -70,14 +70,7 @@ def check_old_value(fileName,json_file):
                     if json_file[j]["name"] == c:
                         tmp = pd.DataFrame([[json_file[j]["name"],json_file[j]["symbol"],json_file[j]["value"]]],columns=["Name","Symbol","Value"])
                 oldDf = oldDf.append(tmp)
-        oldDf.to_csv(fileName,index=False)                     
-
-    # oldDF = pd.read_excel(fileName)
-    # CAMBIARE SE CI SONO TANTI VALORI
-    # criptoName = oldDf.Name.unique()[0]
-    # criptoSymbol = oldDf.Symbol.unique()[0]
-    # oldValue = float(oldDf.Value.unique()[0])
-    # return criptoName,criptoSymbol,oldValue
+        oldDf.to_csv(fileName,index=False)
     return oldDf
 
 def check_price(url,headers,csvFile,oldDf,json_file,delta_perc,mailFrom,mailTo,pwd):
@@ -119,7 +112,7 @@ def main(url,headers,mailFrom,mailTo,pwd,csvFile,delta_perc,i):
 url =  'https://it.investing.com/crypto/currencies'
 headers = {"User-Agent":'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15'}
 csvFile = 'stock_price.csv'
-delta_perc = 0.0001
+delta_perc = 0.0005
 mailFrom = 'investing.notification.bot@gmail.com'
 # mailTo = 'federico.masci96@gmail.com'
 mailTo = 'recensioni.culinarieIT@gmail.com'
@@ -129,8 +122,7 @@ i = 0
 while True:
     print("\n")
     print("Current date: ",datetime.now(),"\n")
-    main(url,headers,mailFrom,mailTo,pwd,csvFile,delta_perc,i)
-    i += 1
-    print("\n\n")
-    print("Sleeping for one hour...")
+    main(url,headers,mailFrom,mailTo,pwd,csvFile,delta_perc)
+    print("\n")
+    print("Sleeping for one hour...\n")
     time.sleep(60*60)
