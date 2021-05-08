@@ -28,28 +28,32 @@ def send_email(mailFrom,pwd,mailTo,df): #df is the df with the values that chang
 
     server.quit()
 
-def add_new_crypto(url,headers):
+def add_new_crypto(url,headers,i):
     page = requests.get(url,headers=headers)
     soup = BeautifulSoup(page.content,"html.parser")
 
-    start = input("Do you want to add a new cryptovalue? (y/n) ")
-    existing = json.load(open("data.json"))
-    last_element = max([int(k[1:]) for k in existing.keys()])
-
-    while start=="y":
-        dic = {}
-        nameC = input("Insert the name of the crypto value: ")
-        symbolC = input("Insert the symbol of the crypto value: ")
-        href = input("Insert the href of the crypto value: ")
+    if i == 0:
+        start = input("Do you want to add a new cryptovalue? (y/n) ")
+        existing = json.load(open("data.json"))
         print("\n")
-        dic["name"] = nameC
-        dic["symbol"] = symbolC
-        dic["href"] = href # "/crypto/currency-pairs?c1=189&amp;c2=12" #TO CHANGE WHENEVER A CRYPTOVALUE IS ADDED
-        dic["value"] = float(soup.find(href=href).get_text().replace('.','').replace(',','.'))
-        last_element += 1
-        existing["c"+str(last_element)] = dic
-        json.dump(existing,open("data.json",'w'))
-        start = input("Do you still want to add more cryptovalues? (y/n)")
+        last_element = max([int(k[1:]) for k in existing.keys()])
+
+        while start=="y":
+            dic = {}
+            nameC = input("Insert the name of the crypto value: ")
+            symbolC = input("Insert the symbol of the crypto value: ")
+            href = input("Insert the href of the crypto value: ")
+            print("\n")
+            dic["name"] = nameC
+            dic["symbol"] = symbolC
+            dic["href"] = href # "/crypto/currency-pairs?c1=189&amp;c2=12" #TO CHANGE WHENEVER A CRYPTOVALUE IS ADDED
+            dic["value"] = float(soup.find(href=href).get_text().replace('.','').replace(',','.'))
+            last_element += 1
+            existing["c"+str(last_element)] = dic
+            json.dump(existing,open("data.json",'w'))
+            start = input("Do you still want to add more cryptovalues? (y/n) ")
+    else:
+        existing = json.load(open("data.json"))
     return existing
 
 #chck the old csv file: if new cryptos are added to json, they are added to csv as well
@@ -106,8 +110,8 @@ def check_price(url,headers,csvFile,oldDf,json_file,delta_perc,mailFrom,mailTo,p
     # value = float(soup.find(href='/crypto/currency-pairs?c1=189&c2=12').get_text().replace('.','').replace(',','.'))
     return value
 
-def main(url,headers,mailFrom,mailTo,pwd,csvFile,delta_perc):
-    json_file = add_new_crypto(url,headers)
+def main(url,headers,mailFrom,mailTo,pwd,csvFile,delta_perc,i):
+    json_file = add_new_crypto(url,headers,i)
     oldDf = check_old_value(csvFile,json_file)
     check_price(url,headers,csvFile,oldDf,json_file,delta_perc,mailFrom,mailTo,pwd)
 
@@ -120,11 +124,13 @@ mailFrom = 'investing.notification.bot@gmail.com'
 # mailTo = 'federico.masci96@gmail.com'
 mailTo = 'recensioni.culinarieIT@gmail.com'
 pwd = 'loxrhejcrnbiafbd'
+i = 0
 
 while True:
     print("\n")
     print("Current date: ",datetime.now(),"\n")
-    main(url,headers,mailFrom,mailTo,pwd,csvFile,delta_perc)
+    main(url,headers,mailFrom,mailTo,pwd,csvFile,delta_perc,i)
+    i += 1
     print("\n\n")
     print("Sleeping for one hour...")
     time.sleep(60*60)
