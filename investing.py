@@ -28,7 +28,7 @@ def send_email(mailFrom,pwd,mailTo,df): #df is the df with the values that chang
 
     server.quit()
 
-def add_new_crypto(url,headers,i):
+def add_new_crypto(url,headers):
     page = requests.get(url,headers=headers)
     soup = BeautifulSoup(page.content,"html.parser")
 
@@ -103,8 +103,23 @@ def check_price(url,headers,csvFile,oldDf,json_file,delta_perc,mailFrom,mailTo,p
     # value = float(soup.find(href='/crypto/currency-pairs?c1=189&c2=12').get_text().replace('.','').replace(',','.'))
     return value
 
-def main(url,headers,mailFrom,mailTo,pwd,csvFile,delta_perc,i):
-    json_file = add_new_crypto(url,headers,i)
+def choose_frequency():
+    print("Choose the frequency of the updates.")
+    print("Types of time: s (seconds), m (minutes), h (hours)")
+    print("Examples:\n   - 10 s: every 10 seconds the data will be updated;\n   - 3 h: every 3 hours the data will be updated.")
+    print("")
+    f_input = input("Insert the frequency: ")
+    f_amount = int(f_input.split(" ")[0])
+    f_type = f_input.split(" ")[1]
+    return f_amount,f_type
+
+def choose_delta():
+    print("Insert the percentage of change you want to be notified for.")
+    print("Examples:\n    - 5: it means if values change by 5% you will be notified by e-mail;\n    - 25: it means if values change by 25% you will be notified by e-mai.")
+    delta = int(input())/100
+    return delta
+
+def main(url,headers,mailFrom,mailTo,pwd,csvFile,delta_perc,json_file):
     oldDf = check_old_value(csvFile,json_file)
     check_price(url,headers,csvFile,oldDf,json_file,delta_perc,mailFrom,mailTo,pwd)
 
@@ -112,18 +127,25 @@ def main(url,headers,mailFrom,mailTo,pwd,csvFile,delta_perc,i):
 url =  'https://it.investing.com/crypto/currencies'
 headers = {"User-Agent":'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15'}
 csvFile = 'stock_price.csv'
-delta_perc = 0.0005
 mailFrom = 'investing.notification.bot@gmail.com'
 # mailTo = 'federico.masci96@gmail.com'
 mailTo = 'recensioni.culinarieIT@gmail.com'
 pwd = 'loxrhejcrnbiafbd'
-i = 0
+freq_amount_dic = {"s":1,"m":60,"h":60*60}
+freq_msg_dic_singolar = {"s":"second","m":"minute","h":"hour"}
+freq_msg_dic_plural = {"s":"seconds","m":"minutes","h":"hours"}
+f_amount, f_type = choose_frequency()
+print("")
+delta_perc = choose_delta()
+json_file = add_new_crypto(url,headers)
 
 while True:
+    print("")
+    print("Current date: ",str(datetime.now())[:-7],"\n")
+    main(url,headers,mailFrom,mailTo,pwd,csvFile,delta_perc,json_file)
     print("\n")
-    print("Current date: ",datetime.now(),"\n")
-    main(url,headers,mailFrom,mailTo,pwd,csvFile,delta_perc,i)
-    i += 1
-    print("\n")
-    print("Sleeping for one hour...\n")
-    time.sleep(5) #one minute: 60, one hour: 60*60
+    if f_amount==1:
+        print("Sleeping for {} {}...".format(str(f_amount),freq_msg_dic_singolar[f_type]))
+    else:
+        print("Sleeping for {} {}...".format(str(f_amount),freq_msg_dic_plural[f_type]))
+    time.sleep(f_amount*freq_amount_dic[f_type]) #one minute: 60, one hour: 60*60
