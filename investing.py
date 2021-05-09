@@ -122,7 +122,8 @@ i = 0
 while True:
     print("\n")
     print("Current date: ",datetime.now(),"\n")
-    main(url,headers,mailFrom,mailTo,pwd,csvFile,delta_perc)
+    main(url,headers,mailFrom,mailTo,pwd,csvFile,delta_perc,i)
+    i += 1
     print("\n")
     print("Sleeping for one hour...\n")
-    time.sleep(60*60)
+    time.sleep(5) #one minute: 60, one hour: 60*60
