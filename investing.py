@@ -32,28 +32,25 @@ def add_new_crypto(url,headers):
     page = requests.get(url,headers=headers)
     soup = BeautifulSoup(page.content,"html.parser")
 
-    if i == 0:
-        start = input("Do you want to add a new cryptovalue? (y/n) ")
-        existing = json.load(open("data.json"))
-        print("\n")
-        last_element = max([int(k[1:]) for k in existing.keys()])
+    start = input("Do you want to add a new cryptovalue? (y/n) ")
+    existing = json.load(open("data.json"))
+    print("\n")
+    last_element = max([int(k[1:]) for k in existing.keys()])
 
-        while start=="y":
-            dic = {}
-            nameC = input("Insert the name of the crypto value: ")
-            symbolC = input("Insert the symbol of the crypto value: ")
-            href = input("Insert the href of the crypto value: ")
-            print("\n")
-            dic["name"] = nameC
-            dic["symbol"] = symbolC
-            dic["href"] = href # "/crypto/currency-pairs?c1=189&amp;c2=12" #TO CHANGE WHENEVER A CRYPTOVALUE IS ADDED
-            dic["value"] = float(soup.find(href=href).get_text().replace('.','').replace(',','.'))
-            last_element += 1
-            existing["c"+str(last_element)] = dic
-            json.dump(existing,open("data.json",'w'))
-            start = input("Do you still want to add more cryptovalues? (y/n) ")
-    else:
-        existing = json.load(open("data.json"))
+    while start=="y":
+        dic = {}
+        nameC = input("Insert the name of the crypto value: ")
+        symbolC = input("Insert the symbol of the crypto value: ")
+        href = input("Insert the href of the crypto value: ")
+        print("\n")
+        dic["name"] = nameC
+        dic["symbol"] = symbolC
+        dic["href"] = href # "/crypto/currency-pairs?c1=189&amp;c2=12" #TO CHANGE WHENEVER A CRYPTOVALUE IS ADDED
+        dic["value"] = float(soup.find(href=href).get_text().replace('.','').replace(',','.'))
+        last_element += 1
+        existing["c"+str(last_element)] = dic
+        json.dump(existing,open("data.json",'w'))
+        start = input("Do you still want to add more cryptovalues? (y/n) ")
     return existing
 
 #check the old csv file: if new cryptos are added to json, they are added to csv as well
@@ -106,7 +103,7 @@ def check_price(url,headers,csvFile,oldDf,json_file,delta_perc,mailFrom,mailTo,p
 def choose_frequency():
     print("Choose the frequency of the updates.")
     print("Types of time: s (seconds), m (minutes), h (hours)")
-    print("Examples:\n   - 10 s: every 10 seconds the data will be updated;\n   - 3 h: every 3 hours the data will be updated.")
+    print("Examples:\n   - 10 s: every 10 seconds the data will be updated;\n   - 5 m: every 5 minutes the data will be updated;\n   - 3 h: every 3 hours the data will be updated.")
     print("")
     f_input = input("Insert the frequency: ")
     f_amount = int(f_input.split(" ")[0])
@@ -115,8 +112,8 @@ def choose_frequency():
 
 def choose_delta():
     print("Insert the percentage of change you want to be notified for.")
-    print("Examples:\n    - 5: it means if values change by 5% you will be notified by e-mail;\n    - 25: it means if values change by 25% you will be notified by e-mai.")
-    delta = int(input())/100
+    print("Examples:\n    - 5: it means that if values change by 5% you will be notified by e-mail;\n    - 25: it means that if values change by 25% you will be notified by e-mail.\n")
+    delta = float(input("Insert the change in percentage: ").replace(" ",""))/100
     return delta
 
 def main(url,headers,mailFrom,mailTo,pwd,csvFile,delta_perc,json_file):
@@ -137,6 +134,7 @@ freq_msg_dic_plural = {"s":"seconds","m":"minutes","h":"hours"}
 f_amount, f_type = choose_frequency()
 print("")
 delta_perc = choose_delta()
+print("")
 json_file = add_new_crypto(url,headers)
 
 while True:
