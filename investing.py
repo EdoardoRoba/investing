@@ -3,10 +3,21 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import smtplib #for email send
 import time
-from datetime import datetime
+from datetime import datetime,timedelta
 import json
 from lxml import html
 import numpy as np
+
+def format_columns(oldDf):
+    oldDf['Starting price'] = oldDf['Starting price'].astype('float').map('{:.4f}'.format)
+    oldDf['Starting price (USD)'] = oldDf['Starting price (USD)'].astype('float').map('{:.4f}'.format)
+    oldDf['Current value'] = oldDf['Current value'].astype('float').map('{:.4f}'.format)
+    oldDf['Delta position'] = oldDf['Delta position'].astype('float').map('{:.4f}'.format)
+    oldDf['Selling value'] = oldDf['Selling value'].astype('float').map('{:.4f}'.format)
+    oldDf['Income'] = oldDf['Income'].astype('float').map('{:.4f}'.format)
+    oldDf['Position'] = oldDf['Position'].astype('float').map('{:.4f}'.format)
+    oldDf['Current position'] = oldDf['Current position'].astype('float').map('{:.4f}'.format)
+    return oldDf
 
 def send_email(mailFrom,pwd,mailTo,df): #df is the df with the values that changed a lot
 
@@ -60,8 +71,12 @@ def add_new_crypto(url,headers):
                 # print(webpage.xpath('//a/@href')[1])
         dic["value"] = float(soup.find(href=dic["href"]).get_text().replace('.','').replace(',','.'))
         dic["starting_price"] = dic["value"]
-        dic["date"] = str(datetime.now())[:10]
+        dic["purchase_date"] = str(datetime.now())[:10]
         dic["selling_value"] = 0
+        # Check if the date is a day after the last position computation
+        dic["yesterday_to_check"] = str(datetime.now())#[:10]
+        dic["yesterday_position"] = (dic["value"]-dic["starting_price"])*dic['quantity']
+        dic["last_update_position"] = (dic["value"]-dic["starting_price"])*dic['quantity']
         last_element += 1
         # print(last_element)
         existing["c"+str(last_element)] = dic
@@ -90,18 +105,20 @@ def check_old_value(fileName,json_file):
                                             json_file[j]["starting_price"],\
                                             json_file[j]["starting_price"]*json_file[j]["quantity"],\
                                             json_file[j]["quantity"],\
-                                            json_file[j]["date"],\
+                                            json_file[j]["purchase_date"],\
                                             json_file[j]["value"],\
+                                            json_file[j]["last_update_position"]-json_file[j]["yesterday_position"],\
                                             json_file[j]["selling_value"],\
                                             json_file[j]["selling_value"]*json_file[j]["quantity"]-json_file[j]["starting_price"]*json_file[j]["quantity"],\
                                             json_file[j]["value"]*json_file[j]["quantity"]-json_file[j]["starting_price"]*json_file[j]["quantity"],\
                                             json_file[j]["value"]*json_file[j]["quantity"]-json_file[j]["starting_price"]*json_file[j]["quantity"]]],\
-                                            columns=["Name","Acronym","Starting price","Starting price (USD)","Quantity","Date","Current value","Selling value","Income","Position","Current position"])
+                                            columns=["Name","Acronym","Starting price","Starting price (USD)","Quantity","Date","Current value","Delta position","Selling value","Income","Position","Current position"])
                 oldDf = oldDf.append(tmp)
         oldDf['Selling value'] = oldDf['Selling value'].fillna(np.nan)
         # print("CIaoo")
         # print(oldDf[["Name","Acronym","Starting price","Starting price (USD)","Quantity","Date","Current value","Selling value","Income","Position","Current position"]])
-        oldDf[["Name","Acronym","Starting price","Starting price (USD)","Quantity","Date","Current value","Selling value","Income","Position","Current position"]].to_csv(fileName,index=False)
+        oldDf = format_columns(oldDf)
+        oldDf[["Name","Acronym","Starting price","Starting price (USD)","Quantity","Date","Current value","Delta position","Selling value","Income","Position","Current position"]].to_csv(fileName,index=False)
     # If you want the code to be sensitive to the changes on csv ==> I wouldn't do it: user can change names ?!
     # else:
     #     for c in cryptos:
@@ -115,17 +132,24 @@ def check_price(url,headers,csvFile,oldDf,json_file,delta_perc,mailFrom,mailTo,p
     soup = BeautifulSoup(page.content,"html.parser")
     # Prints the entire html page
     # print(soup.prettify())
-    newValues = pd.DataFrame(columns=["Name","newValue"])
+    newValues = pd.DataFrame(columns=["Name","newValue","Delta position"])
     for c in json_file:
         # print(json_file[c]["href"])
         value = float(soup.find(href=json_file[c]["href"]).get_text().replace('.','').replace(',','.'))
         # print(value)
         json_file[c]["value"] = value
-        newValues = newValues.append(pd.DataFrame([[json_file[c]["name"],value]],columns=["Name","newValue"]))
+        json_file[c]["last_update_position"] = (json_file[c]["value"]-json_file[c]["starting_price"])*json_file[c]['quantity']
+        now = datetime.strptime(str(datetime.now()),"%Y-%m-%d  %H:%M:%S.%f")
+        # If a day is passed, the position of yesterday is updated with the current one
+        if now-datetime.strptime(json_file[c]["yesterday_to_check"],"%Y-%m-%d %H:%M:%S.%f")>=timedelta(days=1):
+            json_file[c]["yesterday_position"] = json_file[c]["last_update_position"]
+            json_file[c]["yesterday_to_check"] = str(datetime.now())#[:10]
+        newValues = newValues.append(pd.DataFrame([[json_file[c]["name"],value,json_file[c]["last_update_position"]-json_file[c]["yesterday_position"]]],columns=["Name","newValue","Delta position"]))
 
     json.dump(json_file,open("data.json",'w'))
-    oldDf = oldDf.merge(newValues,on=["Name"],how='left')
-    oldDf['Difference Percentage'] = abs((oldDf['newValue']-oldDf['Current value']))/oldDf['Current value']
+    oldDf = oldDf.drop("Delta position",axis=1).merge(newValues,on=["Name"],how='left')
+    # print(oldDf[["newValue","Current value"]])
+    oldDf['Difference Percentage'] = abs((oldDf['newValue']-oldDf['Current value'].astype("float")))/oldDf['Current value'].astype("float")
     oldDf['flag'] = 0
     oldDf['flag'].mask(oldDf['Difference Percentage']>delta_perc,1,inplace=True)
     if 1 in oldDf.flag.unique():
@@ -135,9 +159,10 @@ def check_price(url,headers,csvFile,oldDf,json_file,delta_perc,mailFrom,mailTo,p
         print("E-mail sent!")
     oldDf.drop(["Current value",'Difference Percentage','flag'],axis=1,inplace=True)
     oldDf.rename(columns={"newValue":"Current value"},inplace=True)
-    oldDf["Position"] = oldDf["Current value"]*oldDf["Quantity"] - oldDf["Starting price"]*oldDf["Quantity"]
-    oldDf["Current position"] = oldDf["Current value"]*oldDf["Quantity"] - oldDf["Starting price"]*oldDf["Quantity"]
-    oldDf[["Name","Acronym","Starting price","Starting price (USD)","Quantity","Date","Current value","Selling value","Income","Position","Current position"]].to_csv(csvFile,index=False)
+    oldDf["Position"] = oldDf["Current value"].astype("float")*oldDf["Quantity"].astype("float") - oldDf["Starting price"].astype("float")*oldDf["Quantity"].astype("float")
+    oldDf["Current position"] = oldDf["Current value"].astype("float")*oldDf["Quantity"].astype("float") - oldDf["Starting price"].astype("float")*oldDf["Quantity"].astype("float")
+    oldDf = format_columns(oldDf)
+    oldDf[["Name","Acronym","Starting price","Starting price (USD)","Quantity","Date","Current value","Delta position","Selling value","Income","Position","Current position"]].to_csv(csvFile,index=False)
     # I want to track the info in here
     # value = float(soup.find(href='/crypto/currency-pairs?c1=189&c2=12').get_text().replace('.','').replace(',','.'))
     return value
@@ -164,8 +189,7 @@ def main(url,headers,mailFrom,mailTo,pwd,csvFile,delta_perc,json_file):
 
 
 url =  'https://it.investing.com/crypto/currencies'
-j = json.load(open("data.json"))
-headers = {"User-Agent":j['my_agent']}
+headers = {"User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15"}
 csvFile = 'stock_price.csv'
 mailFrom = 'investing.notification.bot@gmail.com'
 # mailTo = 'federico.masci96@gmail.com'
