@@ -2,31 +2,37 @@
     "c1": {
         "name": "Bitcoin",
         "symbol": "BTC",
-        "value": 57963.6,
+        "value": 57385.0,
         "href": "/crypto/currency-pairs?c1=189&c2=12"
     },
     "c2": {
         "name": "Stellar",
         "symbol": "XLM",
-        "value": 0.59943,
+        "value": 0.70404,
         "href": "/crypto/currency-pairs?c1=229&c2=12"
     },
     "c3": {
         "name": "Cardano",
         "symbol": "ADA",
         "href": "/crypto/currency-pairs?c1=302&c2=12",
-        "value": 1.727871
+        "value": 1.707053
     },
     "c4": {
         "name": "Polkadot",
         "symbol": "DOT",
         "href": "/crypto/currency-pairs?c1=2021&c2=12",
-        "value": 39.5674
+        "value": 39.1771
     },
     "c5": {
         "name": "Dogecoin",
         "symbol": "DOGE",
         "href": "/crypto/currency-pairs?c1=231&c2=12",
-        "value": 0.498187
+        "value": 0.477985
+    },
+    "c6": {
+        "name": "Litecoin",
+        "symbol": "LTC",
+        "href": "/crypto/currency-pairs?c1=191&c2=12",
+        "value": 381.74
     }
 }

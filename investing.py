@@ -5,6 +5,7 @@ import smtplib #for email send
 import time
 from datetime import datetime
 import json
+from lxml import html
 
 def send_email(mailFrom,pwd,mailTo,df): #df is the df with the values that changed a lot
 
@@ -46,15 +47,16 @@ def add_new_crypto(url,headers):
         dic["name"] = nameC
         dic["symbol"] = symbolC
         # dic["href"] = href # "/crypto/currency-pairs?c1=189&amp;c2=12" #TO CHANGE WHENEVER A CRYPTOVALUE IS ADDED
+        prova = soup.find("table").find('tbody').find_all('tr')
         for row in prova:
             cols = row.find_all('td')
             cols = [ele.text.strip() for ele in cols]
-            if symbolC in cols:
+            if (symbolC in cols) and (nameC in cols):
                 # print(row)
                 webpage = html.fromstring(str(row))
                 dic["href"] = webpage.xpath('//a/@href')[1]
                 # print(webpage.xpath('//a/@href')[1])
-        dic["value"] = float(soup.find(href=href).get_text().replace('.','').replace(',','.'))
+        dic["value"] = float(soup.find(href=dic["href"]).get_text().replace('.','').replace(',','.'))
         last_element += 1
         existing["c"+str(last_element)] = dic
         json.dump(existing,open("data.json",'w'))
