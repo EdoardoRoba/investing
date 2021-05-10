@@ -28,11 +28,5 @@
         "symbol": "DOGE",
         "href": "/crypto/currency-pairs?c1=231&c2=12",
         "value": 0.477985
-    },
-    "c6": {
-        "name": "Litecoin",
-        "symbol": "LTC",
-        "href": "/crypto/currency-pairs?c1=191&c2=12",
-        "value": 381.74
     }
 }
