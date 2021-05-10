@@ -41,11 +41,19 @@ def add_new_crypto(url,headers):
         dic = {}
         nameC = input("Insert the name of the crypto value: ")
         symbolC = input("Insert the symbol of the crypto value: ")
-        href = input("Insert the href of the crypto value: ")
+        # href = input("Insert the href of the crypto value: ")
         print("\n")
         dic["name"] = nameC
         dic["symbol"] = symbolC
-        dic["href"] = href # "/crypto/currency-pairs?c1=189&amp;c2=12" #TO CHANGE WHENEVER A CRYPTOVALUE IS ADDED
+        # dic["href"] = href # "/crypto/currency-pairs?c1=189&amp;c2=12" #TO CHANGE WHENEVER A CRYPTOVALUE IS ADDED
+        for row in prova:
+            cols = row.find_all('td')
+            cols = [ele.text.strip() for ele in cols]
+            if symbolC in cols:
+                # print(row)
+                webpage = html.fromstring(str(row))
+                dic["href"] = webpage.xpath('//a/@href')[1]
+                # print(webpage.xpath('//a/@href')[1])
         dic["value"] = float(soup.find(href=href).get_text().replace('.','').replace(',','.'))
         last_element += 1
         existing["c"+str(last_element)] = dic
