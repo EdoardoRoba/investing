@@ -46,7 +46,8 @@ def add_new_crypto(url,headers):
     soup = BeautifulSoup(page.content,"html.parser")
 
     start = input("Do you want to add a new cryptovalue? (y/n) ")
-    existing = json.load(open("data.json"))
+    tot_json = json.load(open("data.json"))
+    existing = tot_json["cryptos"]
     print("\n")
     last_element = max([int(k[1:]) for k in existing.keys()])
 
@@ -80,16 +81,17 @@ def add_new_crypto(url,headers):
         last_element += 1
         # print(last_element)
         existing["c"+str(last_element)] = dic
-        json.dump(existing,open("data.json",'w'))
+        tot_json["cryptos"] = existing
+        json.dump(tot_json,open("data.json",'w'))
         start = input("Do you still want to add more cryptovalues? (y/n) ")
         print("\n")
-    return existing
+    return tot_json
 
 #check the old csv file: if new cryptos are added to json, they are added to csv as well
 def check_old_value(fileName,json_file):
     cryptos = []
-    for j in json_file:
-        cryptos.append(json_file[j]["name"])
+    for j in json_file["cryptos"]:
+        cryptos.append(json_file["cryptos"][j]["name"])
     oldDf = pd.read_csv(fileName)
     existing_cryptos = oldDf.Name.unique()
     # print(existing_cryptos)
@@ -98,20 +100,20 @@ def check_old_value(fileName,json_file):
     if len(existing_cryptos)<len(cryptos):
         for c in cryptos:
             if c not in existing_cryptos:
-                for j in json_file:
-                    if json_file[j]["name"] == c:
-                        tmp = pd.DataFrame([[json_file[j]["name"],\
-                                            json_file[j]["symbol"],\
-                                            json_file[j]["starting_price"],\
-                                            json_file[j]["starting_price"]*json_file[j]["quantity"],\
-                                            json_file[j]["quantity"],\
-                                            json_file[j]["purchase_date"],\
-                                            json_file[j]["value"],\
-                                            json_file[j]["last_update_position"]-json_file[j]["yesterday_position"],\
-                                            json_file[j]["selling_value"],\
-                                            json_file[j]["selling_value"]*json_file[j]["quantity"]-json_file[j]["starting_price"]*json_file[j]["quantity"],\
-                                            json_file[j]["value"]*json_file[j]["quantity"]-json_file[j]["starting_price"]*json_file[j]["quantity"],\
-                                            json_file[j]["value"]*json_file[j]["quantity"]-json_file[j]["starting_price"]*json_file[j]["quantity"]]],\
+                for j in json_file["cryptos"]:
+                    if json_file["cryptos"][j]["name"] == c:
+                        tmp = pd.DataFrame([[json_file["cryptos"][j]["name"],\
+                                            json_file["cryptos"][j]["symbol"],\
+                                            json_file["cryptos"][j]["starting_price"],\
+                                            json_file["cryptos"][j]["starting_price"]*json_file["cryptos"][j]["quantity"],\
+                                            json_file["cryptos"][j]["quantity"],\
+                                            json_file["cryptos"][j]["purchase_date"],\
+                                            json_file["cryptos"][j]["value"],\
+                                            json_file["cryptos"][j]["last_update_position"]-json_file["cryptos"][j]["yesterday_position"],\
+                                            json_file["cryptos"][j]["selling_value"],\
+                                            json_file["cryptos"][j]["selling_value"]*json_file["cryptos"][j]["quantity"]-json_file["cryptos"][j]["starting_price"]*json_file["cryptos"][j]["quantity"],\
+                                            json_file["cryptos"][j]["value"]*json_file["cryptos"][j]["quantity"]-json_file["cryptos"][j]["starting_price"]*json_file["cryptos"][j]["quantity"],\
+                                            json_file["cryptos"][j]["value"]*json_file["cryptos"][j]["quantity"]-json_file["cryptos"][j]["starting_price"]*json_file["cryptos"][j]["quantity"]]],\
                                             columns=["Name","Acronym","Starting price","Starting price (USD)","Quantity","Date","Current value","Delta position","Selling value","Income","Position","Current position"])
                 oldDf = oldDf.append(tmp)
         oldDf['Selling value'] = oldDf['Selling value'].fillna(np.nan)
@@ -133,18 +135,18 @@ def check_price(url,headers,csvFile,oldDf,json_file,delta_perc,mailFrom,mailTo,p
     # Prints the entire html page
     # print(soup.prettify())
     newValues = pd.DataFrame(columns=["Name","newValue","Delta position"])
-    for c in json_file:
+    for c in json_file["cryptos"]:
         # print(json_file[c]["href"])
-        value = float(soup.find(href=json_file[c]["href"]).get_text().replace('.','').replace(',','.'))
+        value = float(soup.find(href=json_file["cryptos"][c]["href"]).get_text().replace('.','').replace(',','.'))
         # print(value)
-        json_file[c]["value"] = value
-        json_file[c]["last_update_position"] = (json_file[c]["value"]-json_file[c]["starting_price"])*json_file[c]['quantity']
+        json_file["cryptos"][c]["value"] = value
+        json_file["cryptos"][c]["last_update_position"] = (json_file["cryptos"][c]["value"]-json_file["cryptos"][c]["starting_price"])*json_file["cryptos"][c]['quantity']
         now = datetime.strptime(str(datetime.now()),"%Y-%m-%d  %H:%M:%S.%f")
         # If a day is passed, the position of yesterday is updated with the current one
-        if now-datetime.strptime(json_file[c]["yesterday_to_check"],"%Y-%m-%d %H:%M:%S.%f")>=timedelta(days=1):
-            json_file[c]["yesterday_position"] = json_file[c]["last_update_position"]
-            json_file[c]["yesterday_to_check"] = str(datetime.now())#[:10]
-        newValues = newValues.append(pd.DataFrame([[json_file[c]["name"],value,json_file[c]["last_update_position"]-json_file[c]["yesterday_position"]]],columns=["Name","newValue","Delta position"]))
+        if now-datetime.strptime(json_file["cryptos"][c]["yesterday_to_check"],"%Y-%m-%d %H:%M:%S.%f")>=timedelta(days=1):
+            json_file["cryptos"][c]["yesterday_position"] = json_file["cryptos"][c]["last_update_position"]
+            json_file["cryptos"][c]["yesterday_to_check"] = str(datetime.now())#[:10]
+        newValues = newValues.append(pd.DataFrame([[json_file["cryptos"][c]["name"],value,json_file["cryptos"][c]["last_update_position"]-json_file["cryptos"][c]["yesterday_position"]]],columns=["Name","newValue","Delta position"]))
 
     json.dump(json_file,open("data.json",'w'))
     oldDf = oldDf.drop("Delta position",axis=1).merge(newValues,on=["Name"],how='left')
@@ -199,7 +201,7 @@ freq_amount_dic = {"s":1,"m":60,"h":60*60}
 freq_msg_dic_singolar = {"s":"second","m":"minute","h":"hour"}
 freq_msg_dic_plural = {"s":"seconds","m":"minutes","h":"hours"}
 f_amount, f_type = choose_frequency()
-print("")
+print("") 
 delta_perc = choose_delta()
 print("")
 json_file = add_new_crypto(url,headers)
