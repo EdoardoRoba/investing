@@ -6,6 +6,7 @@ import time
 from datetime import datetime
 import json
 from lxml import html
+import numpy as np
 
 def send_email(mailFrom,pwd,mailTo,df): #df is the df with the values that changed a lot
 
@@ -17,7 +18,7 @@ def send_email(mailFrom,pwd,mailTo,df): #df is the df with the values that chang
 
     subject = "The price changed a lot!"
     body = "Hey! CHECK THE FILE! The following values:\n\n"
-    for name,symbol,old,new in zip(df.Name.unique(),df.Symbol.unique(),df.Value.unique(),df.newValue.unique()):
+    for name,symbol,old,new in zip(df.Name.unique(),df.Acronym.unique(),df.Value.unique(),df.newValue.unique()):
         body = body + "    - " + name + ": " + symbol + " (from " + str(old) + " to " + str(new) + ")\n"
     body = body + "\nhave changed significantly!"
     msg = "Subject: {}\n\n{}".format(subject,body)
@@ -43,6 +44,7 @@ def add_new_crypto(url,headers):
         nameC = input("Insert the name of the crypto value: ")
         symbolC = input("Insert the symbol of the crypto value: ")
         # href = input("Insert the href of the crypto value: ")
+        dic["quantity"] = float(input("Insert the quantity for this cryptovalue: "))
         print("\n")
         dic["name"] = nameC
         dic["symbol"] = symbolC
@@ -57,10 +59,15 @@ def add_new_crypto(url,headers):
                 dic["href"] = webpage.xpath('//a/@href')[1]
                 # print(webpage.xpath('//a/@href')[1])
         dic["value"] = float(soup.find(href=dic["href"]).get_text().replace('.','').replace(',','.'))
+        dic["starting_price"] = dic["value"]
+        dic["date"] = str(datetime.now())[:10]
+        dic["selling_value"] = 0
         last_element += 1
+        # print(last_element)
         existing["c"+str(last_element)] = dic
         json.dump(existing,open("data.json",'w'))
         start = input("Do you still want to add more cryptovalues? (y/n) ")
+        print("\n")
     return existing
 
 #check the old csv file: if new cryptos are added to json, they are added to csv as well
@@ -70,14 +77,37 @@ def check_old_value(fileName,json_file):
         cryptos.append(json_file[j]["name"])
     oldDf = pd.read_csv(fileName)
     existing_cryptos = oldDf.Name.unique()
+    # print(existing_cryptos)
+    # print(cryptos)
+    
     if len(existing_cryptos)<len(cryptos):
         for c in cryptos:
             if c not in existing_cryptos:
                 for j in json_file:
                     if json_file[j]["name"] == c:
-                        tmp = pd.DataFrame([[json_file[j]["name"],json_file[j]["symbol"],json_file[j]["value"]]],columns=["Name","Symbol","Value"])
+                        tmp = pd.DataFrame([[json_file[j]["name"],\
+                                            json_file[j]["symbol"],\
+                                            json_file[j]["starting_price"],\
+                                            json_file[j]["starting_price"]*json_file[j]["quantity"],\
+                                            json_file[j]["quantity"],\
+                                            json_file[j]["date"],\
+                                            json_file[j]["value"],\
+                                            json_file[j]["selling_value"],\
+                                            json_file[j]["selling_value"]*json_file[j]["quantity"]-json_file[j]["starting_price"]*json_file[j]["quantity"],\
+                                            json_file[j]["value"]*json_file[j]["quantity"]-json_file[j]["starting_price"]*json_file[j]["quantity"],\
+                                            json_file[j]["value"]*json_file[j]["quantity"]-json_file[j]["starting_price"]*json_file[j]["quantity"]]],\
+                                            columns=["Name","Acronym","Starting price","Starting price (USD)","Quantity","Date","Current value","Selling value","Income","Position","Current position"])
                 oldDf = oldDf.append(tmp)
-        oldDf.to_csv(fileName,index=False)
+        oldDf['Selling value'] = oldDf['Selling value'].fillna(np.nan)
+        # print("CIaoo")
+        # print(oldDf[["Name","Acronym","Starting price","Starting price (USD)","Quantity","Date","Current value","Selling value","Income","Position","Current position"]])
+        oldDf[["Name","Acronym","Starting price","Starting price (USD)","Quantity","Date","Current value","Selling value","Income","Position","Current position"]].to_csv(fileName,index=False)
+    # If you want the code to be sensitive to the changes on csv ==> I wouldn't do it: user can change names ?!
+    # else:
+    #     for c in cryptos:
+    #         for j in json_file:
+    #             if json_file[j]["name"] == c:
+
     return oldDf
 
 def check_price(url,headers,csvFile,oldDf,json_file,delta_perc,mailFrom,mailTo,pwd):
@@ -95,7 +125,7 @@ def check_price(url,headers,csvFile,oldDf,json_file,delta_perc,mailFrom,mailTo,p
 
     json.dump(json_file,open("data.json",'w'))
     oldDf = oldDf.merge(newValues,on=["Name"],how='left')
-    oldDf['Difference Percentage'] = abs((oldDf['newValue']-oldDf['Value']))/oldDf['Value']
+    oldDf['Difference Percentage'] = abs((oldDf['newValue']-oldDf['Current value']))/oldDf['Current value']
     oldDf['flag'] = 0
     oldDf['flag'].mask(oldDf['Difference Percentage']>delta_perc,1,inplace=True)
     if 1 in oldDf.flag.unique():
@@ -103,9 +133,11 @@ def check_price(url,headers,csvFile,oldDf,json_file,delta_perc,mailFrom,mailTo,p
         jumpedDf = oldDf[oldDf['flag']==1]
         send_email(mailFrom,pwd,mailTo,jumpedDf)
         print("E-mail sent!")
-    oldDf.drop(["Value",'Difference Percentage','flag'],axis=1,inplace=True)
-    oldDf.rename(columns={"newValue":"Value"},inplace=True)
-    oldDf.to_csv(csvFile,index=False)
+    oldDf.drop(["Current value",'Difference Percentage','flag'],axis=1,inplace=True)
+    oldDf.rename(columns={"newValue":"Current value"},inplace=True)
+    oldDf["Position"] = oldDf["Current value"]*oldDf["Quantity"] - oldDf["Starting price"]*oldDf["Quantity"]
+    oldDf["Current position"] = oldDf["Current value"]*oldDf["Quantity"] - oldDf["Starting price"]*oldDf["Quantity"]
+    oldDf[["Name","Acronym","Starting price","Starting price (USD)","Quantity","Date","Current value","Selling value","Income","Position","Current position"]].to_csv(csvFile,index=False)
     # I want to track the info in here
     # value = float(soup.find(href='/crypto/currency-pairs?c1=189&c2=12').get_text().replace('.','').replace(',','.'))
     return value
@@ -135,8 +167,8 @@ url =  'https://it.investing.com/crypto/currencies'
 headers = {"User-Agent":'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15'}
 csvFile = 'stock_price.csv'
 mailFrom = 'investing.notification.bot@gmail.com'
-mailTo = 'federico.masci96@gmail.com'
-# mailTo = 'recensioni.culinarieIT@gmail.com'
+# mailTo = 'federico.masci96@gmail.com'
+mailTo = 'recensioni.culinarieIT@gmail.com'
 pwd = 'loxrhejcrnbiafbd'
 freq_amount_dic = {"s":1,"m":60,"h":60*60}
 freq_msg_dic_singolar = {"s":"second","m":"minute","h":"hour"}
