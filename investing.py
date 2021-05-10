@@ -61,11 +61,14 @@ def add_new_crypto(url,headers):
         dic["name"] = nameC
         dic["symbol"] = symbolC
         # dic["href"] = href # "/crypto/currency-pairs?c1=189&amp;c2=12" #TO CHANGE WHENEVER A CRYPTOVALUE IS ADDED
-        prova = soup.find("table").find('tbody').find_all('tr')
+        prova = soup.find("table").find('tbody').find_all('tr',limit=1000)
         for row in prova:
-            cols = row.find_all('td')
+            cols = row.find_all('td',limit=1000)
             cols = [ele.text.strip() for ele in cols]
-            if (symbolC in cols) and (nameC in cols):
+            # print(symbolC)
+            # print(nameC)
+            # print(cols)
+            if (symbolC in cols) or (nameC in cols): #  and (nameC in cols)
                 # print(row)
                 webpage = html.fromstring(str(row))
                 dic["href"] = webpage.xpath('//a/@href')[1]
