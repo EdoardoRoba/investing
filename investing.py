@@ -164,7 +164,8 @@ def main(url,headers,mailFrom,mailTo,pwd,csvFile,delta_perc,json_file):
 
 
 url =  'https://it.investing.com/crypto/currencies'
-headers = {"User-Agent":'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15'}
+j = json.load(open("data.json"))
+headers = {"User-Agent":j['my_agent']}
 csvFile = 'stock_price.csv'
 mailFrom = 'investing.notification.bot@gmail.com'
 # mailTo = 'federico.masci96@gmail.com'
