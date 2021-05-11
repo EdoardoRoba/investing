@@ -109,7 +109,6 @@ class Investing():
             newValues = newValues.append(pd.DataFrame([[json_file["cryptos"][c]["name"],value,json_file["cryptos"][c]["last_update_position"]-json_file["cryptos"][c]["yesterday_position"]]],columns=["Name","newValue","Delta position"]))
 
         json.dump(json_file,open("data.json",'w'))
-        # result = self.firebase.post("/-M_RapCgS8J7Svgmgs9m",json_file)
         result = self.firebase.put("/","investing",json_file)
         oldDf = oldDf.drop("Delta position",axis=1).merge(newValues,on=["Name"],how='left')
         # print(oldDf[["newValue","Current value"]])
