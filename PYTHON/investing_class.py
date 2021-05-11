@@ -7,12 +7,18 @@ from datetime import datetime,timedelta
 import json
 from lxml import html
 import numpy as np
+import json
 
 class Investing():
 
     def __init__(self,firebase,urlF):
         self.firebase = firebase
         self.urlF = urlF
+
+    def df_to_json(self,oldDF):
+        result = oldDF.to_json(orient="index")
+        parsed = json.loads(result)
+        resultDF = self.firebase.put("/investing","tables",parsed)
 
     def format_columns(self,oldDf):
         oldDf['Starting price'] = oldDf['Starting price'].astype('float').map('{:.4f}'.format)
@@ -81,6 +87,8 @@ class Investing():
             # print(oldDf[["Name","Acronym","Starting price","Starting price (USD)","Quantity","Date","Current value","Selling value","Income","Position","Current position"]])
             oldDf = self.format_columns(oldDf)
             oldDf[["Name","Acronym","Starting price","Starting price (USD)","Quantity","Date","Current value","Delta position","Selling value","Income","Position","Current position"]].to_csv(fileName,index=False)
+            self.df_to_json(oldDf)
+
         # If you want the code to be sensitive to the changes on csv ==> I wouldn't do it: user can change names ?!
         # else:
         #     for c in cryptos:
@@ -108,7 +116,7 @@ class Investing():
                 json_file["cryptos"][c]["yesterday_to_check"] = str(datetime.now())#[:10]
             newValues = newValues.append(pd.DataFrame([[json_file["cryptos"][c]["name"],value,json_file["cryptos"][c]["last_update_position"]-json_file["cryptos"][c]["yesterday_position"]]],columns=["Name","newValue","Delta position"]))
 
-        json.dump(json_file,open("data.json",'w'))
+        json.dump(json_file,open("cryptos.json",'w'))
         result = self.firebase.put("/","investing",json_file)
         oldDf = oldDf.drop("Delta position",axis=1).merge(newValues,on=["Name"],how='left')
         # print(oldDf[["newValue","Current value"]])
@@ -126,6 +134,7 @@ class Investing():
         oldDf["Current position"] = oldDf["Current value"].astype("float")*oldDf["Quantity"].astype("float") - oldDf["Starting price"].astype("float")*oldDf["Quantity"].astype("float")
         oldDf = self.format_columns(oldDf)
         oldDf[["Name","Acronym","Starting price","Starting price (USD)","Quantity","Date","Current value","Delta position","Selling value","Income","Position","Current position"]].to_csv(csvFile,index=False)
+        self.df_to_json(oldDf)
         # I want to track the info in here
         # value = float(soup.find(href='/crypto/currency-pairs?c1=189&c2=12').get_text().replace('.','').replace(',','.'))
         return value

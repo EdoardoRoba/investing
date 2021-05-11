@@ -10,6 +10,7 @@ import numpy as np
 from firebase import firebase
 from investing_class import Investing
 from settings_class import Settings
+import json
 
 urlF = "https://investing-82e20-default-rtdb.firebaseio.com/"
 firebase = firebase.FirebaseApplication(urlF,None)

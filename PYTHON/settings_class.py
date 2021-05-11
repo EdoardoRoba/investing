@@ -14,6 +14,11 @@ class Settings():
         self.firebase = firebase
         self.urlF = urlF
 
+    def df_to_json(self,oldDF):
+        result = oldDF.to_json(orient="index")
+        parsed = json.loads(result)
+        resultDF = self.firebase.put("/investing","tables",parsed)
+
     def choose_frequency(self):
         print("Choose the frequency of the updates.")
         print("Types of time: s (seconds), m (minutes), h (hours)")
@@ -35,7 +40,7 @@ class Settings():
         soup = BeautifulSoup(page.content,"html.parser")
 
         start = input("Do you want to add a new cryptovalue? (y/n) ")
-        tot_json = json.load(open("data.json"))
+        tot_json = json.load(open("cryptos.json"))
         existing = tot_json["cryptos"]
         print("\n")
         last_element = max([int(k[1:]) for k in existing.keys()])
@@ -74,7 +79,7 @@ class Settings():
             # print(last_element)
             existing["c"+str(last_element)] = dic
             tot_json["cryptos"] = existing
-            json.dump(tot_json,open("data.json",'w'))
+            json.dump(tot_json,open("cryptos.json",'w'))
             result = self.firebase.put("/","investing",json_file)
             start = input("Do you still want to add more cryptovalues? (y/n) ")
             print("\n")
