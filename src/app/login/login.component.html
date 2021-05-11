@@ -1,0 +1,44 @@
+<body>
+
+    <mat-card id="card" style="height: 500px;box-shadow: 5px 10px 18px rgba(0, 90, 226, 0.5);width: 60%;display: flex;justify-content: center;text-align: center;margin-left: auto;margin-right: auto;background-color: rgba(70, 136, 236, 0.363)">
+        <mat-card-content style="margin-top: auto;margin-bottom: auto;">
+
+            <div style="margin-bottom: 2rem;margin-top: 1rem;">
+                <mat-radio-group [(ngModel)]="signlog">
+                    <mat-radio-button class="example-margin" value="signup" style="margin-right: 1rem;">
+                        Sign up
+                    </mat-radio-button>
+                    <mat-radio-button class="example-margin" value="login">
+                        Sign in
+                    </mat-radio-button>
+                </mat-radio-group>
+            </div>
+
+            <p style="color: rgba(0, 0, 0, 0.4);font-size: 0.7rem;">Username and password must contain at least 5 characters.</p>
+            <!-- <br> -->
+
+            <mat-form-field style="margin-left: auto;margin-right: auto;" appearance="fill">
+                <mat-label>Insert username</mat-label>
+                <input matInput [(ngModel)]="username">
+                <button mat-icon-button matSuffix [attr.aria-label]="'User'"><mat-icon>perm_identity</mat-icon></button>
+            </mat-form-field>
+
+            <br>
+
+            <mat-form-field style="margin-left: auto;margin-right: auto;" appearance="fill">
+                <mat-label>Insert password</mat-label>
+                <input matInput [type]="hide ? 'password' : 'text'" [(ngModel)]="password">
+                <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide"><mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon></button>
+            </mat-form-field>
+
+            <br>
+
+            <button mat-icon-button color="primary" (click)="onConfirm()" style="margin-bottom: 1rem;">
+                <mat-icon *ngIf="!((password.length>=5) && (username.length>=5) && (signlog.length>0))" style="color: grey;">done_outline</mat-icon>
+                <mat-icon *ngIf="((password.length>=5) && (username.length>=5) && (signlog.length>0))" style="color: green;">done_outline</mat-icon>
+            </button>
+
+        </mat-card-content>
+    </mat-card>
+        
+</body>

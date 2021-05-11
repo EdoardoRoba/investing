@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "esempio-54778": {
+      "hosting": {
+        "investing-app": [
+          "esempio-54778"
+        ]
+      }
+    }
+  }
+}
