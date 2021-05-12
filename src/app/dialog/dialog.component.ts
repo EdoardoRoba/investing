@@ -15,6 +15,7 @@ export class DialogComponent implements OnInit {
   quantity = new Number()
   date = new Date()
   toAdd: any
+  starting_price = new Number()
   url = "https://investing-82e20-default-rtdb.firebaseio.com/investing/"
 
   constructor(private http: HttpClient,@Inject(MAT_DIALOG_DATA) public user: any, private _snackBar: MatSnackBar) { }
@@ -23,8 +24,8 @@ export class DialogComponent implements OnInit {
   }
 
   addCrypto(){
-    this.toAdd = {user:this.user,name: this.name,acronym:this.acronym,quantity:this.quantity,date:this.date}
-    this.http.put(this.url+'visibility/'+this.user+'.json',this.toAdd).subscribe(
+    this.toAdd = {user:this.user,name: this.name,acronym:this.acronym,quantity:this.quantity,date:this.date,starting_price:this.starting_price}
+    this.http.post(this.url+'visibility/'+this.user+'.json',this.toAdd).subscribe(
       (data) => {
         this.openSnackBar("Crypto added!")
       },
