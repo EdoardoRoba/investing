@@ -40,8 +40,7 @@ class Settings():
         soup = BeautifulSoup(page.content,"html.parser")
 
         start = input("Do you want to add a new cryptovalue? (y/n) ")
-        tot_json = json.load(open("cryptos.json"))
-        existing = tot_json["cryptos"]
+        existing = json.load(open("cryptos.json"))
         print("\n")
         last_element = max([int(k[1:]) for k in existing.keys()])
 
@@ -78,9 +77,8 @@ class Settings():
             last_element += 1
             # print(last_element)
             existing["c"+str(last_element)] = dic
-            tot_json["cryptos"] = existing
-            json.dump(tot_json,open("cryptos.json",'w'))
-            result = self.firebase.put("/","investing",json_file)
+            json.dump(existing,open("cryptos.json",'w'))
+            result = self.firebase.put("/investing","cryptos",json_file)
             start = input("Do you still want to add more cryptovalues? (y/n) ")
             print("\n")
-        return tot_json
+        return existing

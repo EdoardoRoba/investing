@@ -56,8 +56,8 @@ class Investing():
     #check the old csv file: if new cryptos are added to json, they are added to csv as well
     def check_old_value(self,fileName,json_file):
         cryptos = []
-        for j in json_file["cryptos"]:
-            cryptos.append(json_file["cryptos"][j]["name"])
+        for j in json_file:
+            cryptos.append(json_file[j]["name"])
         oldDf = pd.read_csv(fileName)
         existing_cryptos = oldDf.Name.unique()
         # print(existing_cryptos)
@@ -66,20 +66,20 @@ class Investing():
         if len(existing_cryptos)<len(cryptos):
             for c in cryptos:
                 if c not in existing_cryptos:
-                    for j in json_file["cryptos"]:
-                        if json_file["cryptos"][j]["name"] == c:
-                            tmp = pd.DataFrame([[json_file["cryptos"][j]["name"],\
-                                                json_file["cryptos"][j]["symbol"],\
-                                                json_file["cryptos"][j]["starting_price"],\
-                                                json_file["cryptos"][j]["starting_price"]*json_file["cryptos"][j]["quantity"],\
-                                                json_file["cryptos"][j]["quantity"],\
-                                                json_file["cryptos"][j]["purchase_date"],\
-                                                json_file["cryptos"][j]["value"],\
-                                                json_file["cryptos"][j]["last_update_position"]-json_file["cryptos"][j]["yesterday_position"],\
-                                                json_file["cryptos"][j]["selling_value"],\
-                                                json_file["cryptos"][j]["selling_value"]*json_file["cryptos"][j]["quantity"]-json_file["cryptos"][j]["starting_price"]*json_file["cryptos"][j]["quantity"],\
-                                                json_file["cryptos"][j]["value"]*json_file["cryptos"][j]["quantity"]-json_file["cryptos"][j]["starting_price"]*json_file["cryptos"][j]["quantity"],\
-                                                json_file["cryptos"][j]["value"]*json_file["cryptos"][j]["quantity"]-json_file["cryptos"][j]["starting_price"]*json_file["cryptos"][j]["quantity"]]],\
+                    for j in json_file:
+                        if json_file[j]["name"] == c:
+                            tmp = pd.DataFrame([[json_file[j]["name"],\
+                                                json_file[j]["symbol"],\
+                                                json_file[j]["starting_price"],\
+                                                json_file[j]["starting_price"]*json_file[j]["quantity"],\
+                                                json_file[j]["quantity"],\
+                                                json_file[j]["purchase_date"],\
+                                                json_file[j]["value"],\
+                                                json_file[j]["last_update_position"]-json_file[j]["yesterday_position"],\
+                                                json_file[j]["selling_value"],\
+                                                json_file[j]["selling_value"]*json_file[j]["quantity"]-json_file[j]["starting_price"]*json_file[j]["quantity"],\
+                                                json_file[j]["value"]*json_file[j]["quantity"]-json_file[j]["starting_price"]*json_file[j]["quantity"],\
+                                                json_file[j]["value"]*json_file[j]["quantity"]-json_file[j]["starting_price"]*json_file[j]["quantity"]]],\
                                                 columns=["Name","Acronym","Starting price","Starting price (USD)","Quantity","Date","Current value","Delta position","Selling value","Income","Position","Current position"])
                     oldDf = oldDf.append(tmp)
             oldDf['Selling value'] = oldDf['Selling value'].fillna(np.nan)
@@ -103,21 +103,21 @@ class Investing():
         # Prints the entire html page
         # print(soup.prettify())
         newValues = pd.DataFrame(columns=["Name","newValue","Delta position"])
-        for c in json_file["cryptos"]:
+        for c in json_file:
             # print(json_file[c]["href"])
-            value = float(soup.find(href=json_file["cryptos"][c]["href"]).get_text().replace('.','').replace(',','.'))
+            value = float(soup.find(href=json_file[c]["href"]).get_text().replace('.','').replace(',','.'))
             # print(value)
-            json_file["cryptos"][c]["value"] = value
-            json_file["cryptos"][c]["last_update_position"] = (json_file["cryptos"][c]["value"]-json_file["cryptos"][c]["starting_price"])*json_file["cryptos"][c]['quantity']
+            json_file[c]["value"] = value
+            json_file[c]["last_update_position"] = (json_file[c]["value"]-json_file[c]["starting_price"])*json_file[c]['quantity']
             now = datetime.strptime(str(datetime.now()),"%Y-%m-%d  %H:%M:%S.%f")
             # If a day is passed, the position of yesterday is updated with the current one
-            if now-datetime.strptime(json_file["cryptos"][c]["yesterday_to_check"],"%Y-%m-%d %H:%M:%S.%f")>=timedelta(days=1):
-                json_file["cryptos"][c]["yesterday_position"] = json_file["cryptos"][c]["last_update_position"]
-                json_file["cryptos"][c]["yesterday_to_check"] = str(datetime.now())#[:10]
-            newValues = newValues.append(pd.DataFrame([[json_file["cryptos"][c]["name"],value,json_file["cryptos"][c]["last_update_position"]-json_file["cryptos"][c]["yesterday_position"]]],columns=["Name","newValue","Delta position"]))
+            if now-datetime.strptime(json_file[c]["yesterday_to_check"],"%Y-%m-%d %H:%M:%S.%f")>=timedelta(days=1):
+                json_file[c]["yesterday_position"] = json_file[c]["last_update_position"]
+                json_file[c]["yesterday_to_check"] = str(datetime.now())#[:10]
+            newValues = newValues.append(pd.DataFrame([[json_file[c]["name"],value,json_file[c]["last_update_position"]-json_file[c]["yesterday_position"]]],columns=["Name","newValue","Delta position"]))
 
         json.dump(json_file,open("cryptos.json",'w'))
-        result = self.firebase.put("/","investing",json_file)
+        result = self.firebase.put("/investing","cryptos",json_file)
         oldDf = oldDf.drop("Delta position",axis=1).merge(newValues,on=["Name"],how='left')
         # print(oldDf[["newValue","Current value"]])
         oldDf['Difference Percentage'] = abs((oldDf['newValue']-oldDf['Current value'].astype("float")))/oldDf['Current value'].astype("float")
