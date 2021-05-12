@@ -15,7 +15,21 @@ class Settings():
         self.urlF = urlF
 
     def df_to_json(self,oldDF):
-        result = oldDF.to_json(orient="index")
+        df = oldDF.copy()
+        df.rename(columns={"Name":"name",\
+                            "Acronym":"acronym",
+                            "Starting price":"starting_price",
+                            "Starting price (USD)":"starting_price_usd",
+                            "Quantity":"quantity",
+                            "Date":"date",
+                            "Current value":"current_value",
+                            "Delta position":"delta_position",
+                            "Selling value":"selling_value",
+                            "Income":"income",
+                            "Position":"position",
+                            "Current position":"current_position"
+                            },inplace=True)
+        result = df.to_json(orient="index")
         parsed = json.loads(result)
         resultDF = self.firebase.put("/investing","tables",parsed)
 
