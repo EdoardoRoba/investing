@@ -30,6 +30,7 @@ class Investing():
                             "Position":"position",
                             "Current position":"current_position"
                             },inplace=True)
+        df.reset_index(inplace=True)
         result = df.to_json(orient="index")
         parsed = json.loads(result)
         resultDF = self.firebase.put("/investing","tables",parsed)

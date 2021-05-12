@@ -92,7 +92,7 @@ class Settings():
             # print(last_element)
             existing["c"+str(last_element)] = dic
             json.dump(existing,open("cryptos.json",'w'))
-            result = self.firebase.put("/investing","cryptos",json_file)
+            result = self.firebase.put("/investing","cryptos",existing)
             start = input("Do you still want to add more cryptovalues? (y/n) ")
             print("\n")
         return existing
