@@ -1,65 +1,75 @@
-<table style="width: 90%;margin-left: auto;margin-right: auto;" mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-    
-    <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef> Name </th>
-        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
-    </ng-container>
-    
-    <ng-container matColumnDef="acronym">
-        <th mat-header-cell *matHeaderCellDef> Acronym </th>
-        <td mat-cell *matCellDef="let element"> {{element.acronym}} </td>
-    </ng-container>
-    
-    <ng-container matColumnDef="starting_price">
-        <th mat-header-cell *matHeaderCellDef> Starting price </th>
-        <td mat-cell *matCellDef="let element"> {{element.starting_price}} </td>
-    </ng-container>
-    
-    <ng-container matColumnDef="starting_price_usd">
-        <th mat-header-cell *matHeaderCellDef> Starting price (USD) </th>
-        <td mat-cell *matCellDef="let element"> {{element.starting_price_usd}} </td>
-    </ng-container>
-    
-    <ng-container matColumnDef="quantity">
-        <th mat-header-cell *matHeaderCellDef> Quantity </th>
-        <td mat-cell *matCellDef="let element"> {{element.quantity}} </td>
-    </ng-container>
-    
-    <ng-container matColumnDef="date">
-        <th mat-header-cell *matHeaderCellDef> Date </th>
-        <td mat-cell *matCellDef="let element"> {{element.date}} </td>
-    </ng-container>
-    
-    <ng-container matColumnDef="current_value">
-        <th mat-header-cell *matHeaderCellDef> Current value </th>
-        <td mat-cell *matCellDef="let element"> {{element.current_value}} </td>
-    </ng-container>
-    
-    <ng-container matColumnDef="delta_position">
-        <th mat-header-cell *matHeaderCellDef> Delta position </th>
-        <td mat-cell *matCellDef="let element"> {{element.delta_position}} </td>
-    </ng-container>
-    
-    <ng-container matColumnDef="selling_value">
-        <th mat-header-cell *matHeaderCellDef> Selling value </th>
-        <td mat-cell *matCellDef="let element"> {{element.selling_value}} </td>
-    </ng-container>
-    
-    <ng-container matColumnDef="income">
-        <th mat-header-cell *matHeaderCellDef> Income </th>
-        <td mat-cell *matCellDef="let element"> {{element.income}} </td>
-    </ng-container>
-    
-    <ng-container matColumnDef="position">
-        <th mat-header-cell *matHeaderCellDef> Position </th>
-        <td mat-cell *matCellDef="let element"> {{element.position}} </td>
-    </ng-container>
-    
-    <ng-container matColumnDef="current_position">
-        <th mat-header-cell *matHeaderCellDef> Current position </th>
-        <td mat-cell *matCellDef="let element"> {{element.current_position}} </td>
-    </ng-container>
+<div>
+    <table style="width: 90%;margin-left: auto;margin-right: auto;background-color: rgba(247, 247, 78, 0.103);" mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+        
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef> Name </th>
+            <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+        </ng-container>
+        
+        <ng-container matColumnDef="acronym">
+            <th mat-header-cell *matHeaderCellDef> Acronym </th>
+            <td mat-cell *matCellDef="let element"> {{element.acronym}} </td>
+        </ng-container>
+        
+        <ng-container matColumnDef="starting_price">
+            <th mat-header-cell *matHeaderCellDef> Starting price </th>
+            <td mat-cell *matCellDef="let element"> {{element.starting_price}} </td>
+        </ng-container>
+        
+        <ng-container matColumnDef="starting_price_usd">
+            <th mat-header-cell *matHeaderCellDef> Starting price (USD) </th>
+            <td mat-cell *matCellDef="let element"> {{element.starting_price_usd}} </td>
+        </ng-container>
+        
+        <ng-container matColumnDef="quantity">
+            <th mat-header-cell *matHeaderCellDef> Quantity </th>
+            <td mat-cell *matCellDef="let element"> {{element.quantity}} </td>
+        </ng-container>
+        
+        <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef> Date </th>
+            <td mat-cell *matCellDef="let element"> {{element.date}} </td>
+        </ng-container>
+        
+        <ng-container matColumnDef="current_value">
+            <th mat-header-cell *matHeaderCellDef> Current value </th>
+            <td mat-cell *matCellDef="let element"> {{element.current_value}} </td>
+        </ng-container>
+        
+        <ng-container matColumnDef="delta_position">
+            <th mat-header-cell *matHeaderCellDef> Delta position </th>
+            <td mat-cell *matCellDef="let element"> {{element.delta_position}} </td>
+        </ng-container>
+        
+        <ng-container matColumnDef="selling_value">
+            <th mat-header-cell *matHeaderCellDef> Selling value </th>
+            <td mat-cell *matCellDef="let element"> {{element.selling_value}} </td>
+        </ng-container>
+        
+        <ng-container matColumnDef="income">
+            <th mat-header-cell *matHeaderCellDef> Income </th>
+            <td mat-cell *matCellDef="let element"> {{element.income}} </td>
+        </ng-container>
+        
+        <ng-container matColumnDef="position">
+            <th mat-header-cell *matHeaderCellDef> Position </th>
+            <td mat-cell *matCellDef="let element"> {{element.position}} </td>
+        </ng-container>
+        
+        <ng-container matColumnDef="current_position">
+            <th mat-header-cell *matHeaderCellDef> Current position </th>
+            <td mat-cell *matCellDef="let element"> {{element.current_position}} </td>
+        </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-</table>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <span style="margin-top: 3rem;display: flex;justify-content: center;text-align: center;margin-left: auto;margin-right: auto;">
+        <button (click)="addCrypto()" style="margin-top: 3rem;display: flex;justify-content: center;text-align: center;margin-left: auto;margin-right: auto;background-color: green;" mat-mini-fab color="accent" aria-label="Example icon button with a plus one icon">
+            <mat-icon>plus_one</mat-icon>
+        </button>
+    </span>
+    <p style="margin-top: 0.6rem;display: flex;justify-content: center;text-align: center;margin-left: auto;margin-right: auto;color: rgba(0, 0, 0, 0.4);font-size: 0.8rem;">Insert a new crypto</p>
+
+</div>

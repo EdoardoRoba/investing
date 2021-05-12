@@ -16,7 +16,7 @@ export class LoginComponent implements OnInit {
 
   // txt = uuidv4();
   hide = true;
-  url = 'https://investing-82e20-default-rtdb.firebaseio.com/investing/users.json'
+  url = 'https://investing-82e20-default-rtdb.firebaseio.com/investing/'
   signlog = "";
   password = "";
   username = "";
@@ -24,7 +24,7 @@ export class LoginComponent implements OnInit {
   objs: any[]=[]
 
   ngOnInit(): void {
-    this.http.get(this.url).subscribe((responseData:any) => {
+    this.http.get(this.url + 'users.json').subscribe((responseData:any) => {
       Object.keys(responseData).forEach(element => {
         this.users.push(responseData[element].user);
         this.objs.push(responseData[element]);
@@ -45,11 +45,12 @@ export class LoginComponent implements OnInit {
     if(this.signlog=="signup"){
       if (userExists.length==0) {
         let auth = {user: this.username,password: this.password,id:txt}
-        this.http.post(this.url,auth).subscribe(
+        this.http.post(this.url+'users.json',auth).subscribe(
           (responseData) => {
             this.updateUsername()
             console.log("New user added");
             this.router.navigateByUrl('/home');
+            this.http.put(this.url+'visibility/'+this.username+'.json',{user:this.username}).subscribe()
           },
           (error) => {
             console.log("Error: ",error)
