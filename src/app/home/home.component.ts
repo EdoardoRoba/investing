@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { CommunicationService } from '../communication.service';
 import { interval } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../dialog/dialog.component';
+import { CommunicationService } from '../services/communication.service/communication.service';
 
 export interface CryptoTemplate {
   name: string;
@@ -71,6 +71,7 @@ export class HomeComponent implements OnInit {
     });
     
     interval(5000).subscribe(x => {this.getData()})
+    interval(5000).subscribe(x => {this.updateTableToDisplay()})
     interval(5000).subscribe(x => {this.fillDataToDisplay()})
 
   }
@@ -92,30 +93,22 @@ export class HomeComponent implements OnInit {
 
   addCrypto(){
     //Inject the data in the dialog
-    const dialogRef = this.dialog.open(DialogComponent,{
-      data: this.user
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log(`Dialog result: ${result}`);
-      // this.retrievedData = []
-
-      this.http.get(this.url+'visibility/'+this.user+'.json').subscribe((responseData:any) => {
-        // console.log("ciaoooo",responseData)
-        this.dataToCheck = []
-        Object.keys(responseData).forEach(element => {
-          if (responseData[element] != this.user){
-            this.dataToCheck.push(responseData[element]);
-          }
-        });
-        this.fillDataToDisplay()
+      const dialogRef = this.dialog.open(DialogComponent,{
+        data: this.user
       });
-    });
+
+      dialogRef.afterClosed().subscribe(result => {
+        console.log(`Dialog result: ${result}`);
+        // this.retrievedData = []
+        this.updateTableToDisplay()
+      });
   }
 
   fillDataToDisplay(){
     // console.log("table",this.dataSource)
     this.dataToDisplay = []
+    // console.log("tables:",this.dataSource)
+    // console.log("usersdata:",this.dataToCheck)
     this.dataSource.forEach((elTable:any) => {
       this.dataToCheck.forEach((elUser:any) => {
         if (elTable.acronym == elUser.acronym){
@@ -123,20 +116,32 @@ export class HomeComponent implements OnInit {
           this.dataToDisplay.push({name:elTable.name,
                                   acronym:elTable.acronym,
                                   starting_price:elUser.starting_price,
-                                  starting_price_usd:(elUser.starting_price*elUser.quantity).toFixed(4),
+                                  starting_price_usd:(elUser.starting_price*elUser.quantity).toFixed(2),
                                   quantity:elUser.quantity,
                                   date:elUser.date.substring(0,10),
                                   current_value:elTable.current_value,
-                                  delta_position:(0).toFixed(4),
-                                  selling_value:(0).toFixed(4),
-                                  income:(0*elUser.quantity - elUser.starting_price*elUser.quantity).toFixed(4),
-                                  position:(elTable.current_value*elUser.quantity-elUser.starting_price*elUser.quantity).toFixed(4),
-                                  current_position:(elTable.current_value*elUser.quantity-elUser.starting_price*elUser.quantity).toFixed(4)
+                                  delta_position:0,
+                                  selling_value:0,
+                                  income:(0*elUser.quantity - elUser.starting_price*elUser.quantity).toFixed(2),
+                                  position:(elTable.current_value*elUser.quantity-elUser.starting_price*elUser.quantity).toFixed(2),
+                                  current_position:(elTable.current_value*elUser.quantity-elUser.starting_price*elUser.quantity).toFixed(2)
                                 })
         }
       })
     });
     // console.log("dataaaa",this.dataToDisplay)
+  }
+
+  updateTableToDisplay(){
+    this.http.get(this.url+'visibility/'+this.user+'.json').subscribe((responseData:any) => {
+      this.dataToCheck = []
+      Object.keys(responseData).forEach(element => {
+        if (responseData[element] != this.user){
+          this.dataToCheck.push(responseData[element]);
+        }
+      });
+      this.fillDataToDisplay()
+    });
   }
 
 }

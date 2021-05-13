@@ -2,8 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { v4 as uuidv4 } from 'uuid';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { CommunicationService } from '../communication.service';
 import { Router } from '@angular/router';
+import { CommunicationService } from '../services/communication.service/communication.service';
 
 @Component({
   selector: 'login',

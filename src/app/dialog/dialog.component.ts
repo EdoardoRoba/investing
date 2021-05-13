@@ -28,6 +28,7 @@ export class DialogComponent implements OnInit {
     this.http.post(this.url+'visibility/'+this.user+'.json',this.toAdd).subscribe(
       (data) => {
         this.openSnackBar("Crypto added!")
+        console.log("added:",data)
       },
       (error) => {
         console.log("Error: ",error)
