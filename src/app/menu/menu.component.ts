@@ -6,6 +6,7 @@ export interface Tile {
   cols: number;
   rows: number;
   text: string;
+  icon: string
 }
 
 @Component({
@@ -16,10 +17,10 @@ export interface Tile {
 export class MenuComponent implements OnInit {
 
   tiles: Tile[] = [
-    {text: 'Home', cols: 3, rows: 1, color: 'lightblue'},
-    {text: 'History', cols: 1, rows: 2, color: 'lightgreen'},
-    {text: 'Buy/Sell', cols: 1, rows: 1, color: 'lightpink'},
-    {text: 'You', cols: 2, rows: 1, color: '#DDBDF1'},
+    {text: 'Your cryptos', cols: 3, rows: 1, color: 'lightblue', icon: 'home'},
+    {text: 'History', cols: 1, rows: 2, color: 'lightgreen', icon: 'timeline'},
+    {text: 'Buy/Sell', cols: 1, rows: 1, color: 'lightpink', icon: 'swap_vert'},
+    {text: 'You', cols: 2, rows: 1, color: '#DDBDF1', icon: 'account_circle'},
   ];
 
   constructor(private router: Router) {}

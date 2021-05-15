@@ -1,8 +1,36 @@
 <body>
 
 <mat-toolbar style="background-color: rgb(0, 0, 223);margin-bottom: 4rem;">
+
+  <button style="display: flex;justify-content: right;text-align: right;" mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+    <mat-icon style="color: white;">more_vert</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    <button [routerLink]="['/menu']" mat-menu-item>
+      <mat-icon style="color: rgb(0, 0, 223);">menu</mat-icon>
+      <span>Menu</span>
+    </button>
+    <button [routerLink]="['/home']" mat-menu-item>
+      <mat-icon style="color: rgb(0, 0, 223);">home</mat-icon>
+      <span>Your cryptos</span>
+    </button>
+    <button mat-menu-item>
+      <mat-icon style="color:rgb(0, 0, 223);">timeline</mat-icon>
+      <span>History</span>
+    </button>
+    <button mat-menu-item>
+      <mat-icon style="color:rgb(0, 0, 223);">swap_vert</mat-icon>
+      <span>Buy/Sell</span>
+    </button>
+    <button mat-menu-item>
+      <mat-icon style="color:rgb(0, 0, 223);">account_circle</mat-icon>
+      <span>You</span>
+    </button>
+  </mat-menu>
+
   <mat-icon style="color:white">local_fire_department</mat-icon>
   <span style="color:white">Investing</span>
+
 </mat-toolbar>
 
 <div class="body">

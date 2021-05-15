@@ -32,6 +32,7 @@ import { FormsModule } from '@angular/forms';
 import { DialogComponent } from './dialog/dialog.component';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MenuComponent } from './menu/menu.component';
+import { MatMenuModule } from '@angular/material/menu';
 
 @NgModule({
   declarations: [
@@ -67,7 +68,8 @@ import { MenuComponent } from './menu/menu.component';
     MatTableModule,
     MatSlideToggleModule,
     MatRadioModule,
-    MatGridListModule
+    MatGridListModule,
+    MatMenuModule
   ],
   providers: [],
   bootstrap: [AppComponent]
