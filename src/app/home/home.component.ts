@@ -108,6 +108,7 @@ export class HomeComponent implements OnInit {
       dialogRef.afterClosed().subscribe(result => {
         console.log(`Dialog result: ${result}`);
         // this.retrievedData = []
+        this.showEmptyMsg = false
         this.updateTableToDisplay()
       });
   }
@@ -141,7 +142,7 @@ export class HomeComponent implements OnInit {
   }
 
   updateTableToDisplay(){
-    this.showLoading=true
+    // this.showLoading=true
     this.http.get(this.url+'visibility/'+this.user+'.json').subscribe((responseData:any) => {
       this.dataToCheck = []
       Object.keys(responseData).forEach(element => {

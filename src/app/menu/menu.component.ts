@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-// import { HostListener } from "@angular/core";
-// import { interval } from 'rxjs';
 
 export interface Tile {
   color: string;
@@ -13,12 +11,7 @@ export interface Tile {
 @Component({
   selector: 'app-menu',
   templateUrl: './menu.component.html',
-  // template: '<h1 [style.--color]="color" [style.--position]="position" [style.--left]="left" [style.--top]="top">CSS vars works!</h1>',
   styleUrls: ['./menu.component.css'],
-  // styles: ['h1 { color: var(--color); position: var(--position); left: var(--left); top: var(--top); }'],
-  // animations: [
-  //   animate
-  // ]
 })
 export class MenuComponent implements OnInit {
 
