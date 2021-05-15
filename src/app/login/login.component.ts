@@ -49,7 +49,8 @@ export class LoginComponent implements OnInit {
           (responseData) => {
             this.updateUsername()
             console.log("New user added");
-            this.router.navigateByUrl('/home');
+            // this.router.navigateByUrl('/home');
+            this.router.navigateByUrl('/menu');
             this.http.put(this.url+'visibility/'+this.username+'.json',{user:this.username}).subscribe()
           },
           (error) => {
@@ -72,7 +73,8 @@ export class LoginComponent implements OnInit {
           if (passwordInput==this.password){
             this.updateUsername()
             console.log("Welcome back user "+this.username+"!")
-            this.router.navigateByUrl('/home');
+            // this.router.navigateByUrl('/home');
+            this.router.navigateByUrl('/menu');
           } else {
             console.log("Incorrect password!")
             this.openSnackBar("Password errata!")

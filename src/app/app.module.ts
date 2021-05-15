@@ -30,13 +30,16 @@ import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { FormsModule } from '@angular/forms';
 import { DialogComponent } from './dialog/dialog.component';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MenuComponent } from './menu/menu.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
     LoginComponent,
-    DialogComponent
+    DialogComponent,
+    MenuComponent
   ],
   imports: [
     BrowserModule,
@@ -63,7 +66,8 @@ import { DialogComponent } from './dialog/dialog.component';
     MatListModule,
     MatTableModule,
     MatSlideToggleModule,
-    MatRadioModule
+    MatRadioModule,
+    MatGridListModule
   ],
   providers: [],
   bootstrap: [AppComponent]

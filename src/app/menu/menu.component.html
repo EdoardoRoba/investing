@@ -1,0 +1,11 @@
+
+<mat-grid-list style="margin-left: auto;margin-right: auto;width: 90%;margin-top: 10rem;" cols="4" rowHeight="200px">
+    <mat-grid-tile style="border: solid 3px #000;"
+        *ngFor="let tile of tiles"
+        [colspan]="tile.cols"
+        [rowspan]="tile.rows"
+        [style.background]="tile.color">
+        <!-- {{tile.text}} -->
+        <button mat-button color="primary" (click)="goTo(tile.text)">{{tile.text}}</button>
+    </mat-grid-tile>
+</mat-grid-list>

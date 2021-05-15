@@ -35,6 +35,9 @@ export class HomeComponent implements OnInit {
   dataToDisplay: any[]=[]
   dataToCheck: any[]=[]
 
+  showLoading = true
+  showEmptyMsg = false
+
   constructor(private http: HttpClient, private data: CommunicationService, public dialog: MatDialog) { }
 
   ngOnInit(): void {
@@ -42,6 +45,7 @@ export class HomeComponent implements OnInit {
     this.data.currentMessage.subscribe(message => this.user = message)
     console.log("USR: ",this.user)
     // Retrieve the tables
+    this.showLoading=true
     this.http.get(this.url+'tables.json').subscribe((responseData:any) => {
       Object.keys(responseData).forEach(element => {
         tables.push(responseData[element]);
@@ -60,15 +64,19 @@ export class HomeComponent implements OnInit {
         }
       });
       this.fillDataToDisplay()
+      this.showLoading=false
+      if (this.dataToCheck.length===0){this.showLoading=false,this.showEmptyMsg=true}
+      if (this.dataToCheck.length>0){this.showLoading=true,this.showEmptyMsg=false}
+
     });
-    this.http.get(this.url+'visibility/'+this.user+'.json').subscribe((responseData:any) => {
-      // console.log("rgefedcf",responseData)
-      Object.keys(responseData).forEach(element => {
-        if (responseData[element] != this.user){
-          this.dataToDisplay.push(responseData[element]);
-        }
-      });
-    });
+    // this.http.get(this.url+'visibility/'+this.user+'.json').subscribe((responseData:any) => {
+    //   // console.log("rgefedcf",responseData)
+    //   Object.keys(responseData).forEach(element => {
+    //     if (responseData[element] != this.user){
+    //       this.dataToDisplay.push(responseData[element]);
+    //     }
+    //   });
+    // });
     
     interval(5000).subscribe(x => {this.getData()})
     interval(5000).subscribe(x => {this.updateTableToDisplay()})
@@ -133,6 +141,7 @@ export class HomeComponent implements OnInit {
   }
 
   updateTableToDisplay(){
+    this.showLoading=true
     this.http.get(this.url+'visibility/'+this.user+'.json').subscribe((responseData:any) => {
       this.dataToCheck = []
       Object.keys(responseData).forEach(element => {
@@ -141,6 +150,9 @@ export class HomeComponent implements OnInit {
         }
       });
       this.fillDataToDisplay()
+      this.showLoading=false
+      if (this.dataToCheck.length===0){this.showLoading=false,this.showEmptyMsg=true}
+      if (this.dataToCheck.length>0){this.showLoading=true,this.showEmptyMsg=false}
     });
   }
 
