@@ -28,6 +28,12 @@ export class MenuComponent implements OnInit {
   ngOnInit(): void {}
 
   goTo(toPage: string){
+    if (toPage=='Your cryptos'){
+      toPage = 'Home'
+    }
+    if (toPage=='Buy/Sell'){
+      toPage = 'buysell'
+    }
     this.router.navigateByUrl('/'+toPage.toLowerCase());
   }
 

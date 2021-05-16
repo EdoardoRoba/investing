@@ -33,6 +33,8 @@ import { DialogComponent } from './dialog/dialog.component';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MenuComponent } from './menu/menu.component';
 import { MatMenuModule } from '@angular/material/menu';
+import { HistoryComponent } from './history/history.component';
+import { ChartsModule, WavesModule } from 'angular-bootstrap-md'
 
 @NgModule({
   declarations: [
@@ -40,7 +42,8 @@ import { MatMenuModule } from '@angular/material/menu';
     HomeComponent,
     LoginComponent,
     DialogComponent,
-    MenuComponent
+    MenuComponent,
+    HistoryComponent
   ],
   imports: [
     BrowserModule,
@@ -69,7 +72,9 @@ import { MatMenuModule } from '@angular/material/menu';
     MatSlideToggleModule,
     MatRadioModule,
     MatGridListModule,
-    MatMenuModule
+    MatMenuModule,
+    ChartsModule,
+    WavesModule
   ],
   providers: [],
   bootstrap: [AppComponent]

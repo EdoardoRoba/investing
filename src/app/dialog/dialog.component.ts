@@ -24,9 +24,9 @@ export class DialogComponent implements OnInit {
   }
 
   addCrypto(){
-    this.toAdd = {user:this.user,name: this.name,acronym:this.acronym,quantity:this.quantity,date:this.date,starting_price:this.starting_price}
-    this.http.post(this.url+'visibility/'+this.user+'.json',this.toAdd).subscribe(
-      (data) => {
+    this.toAdd = {user:this.user,name: this.name,acronym:this.acronym,quantity:this.quantity,date:this.date,starting_price:this.starting_price,yesterday_position:0,now_position:0,yesterday:new Date()}
+    this.http.put(this.url+'visibility/'+this.user+'/'+this.acronym+'.json',this.toAdd).subscribe(
+        (data) => {
         this.openSnackBar("Crypto added!")
         console.log("added:",data)
       },

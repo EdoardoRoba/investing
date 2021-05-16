@@ -121,19 +121,33 @@ export class HomeComponent implements OnInit {
     this.dataSource.forEach((elTable:any) => {
       this.dataToCheck.forEach((elUser:any) => {
         if (elTable.acronym == elUser.acronym){
-
+          // if (new Date){
+          elUser.position = elTable.current_value*elUser.quantity-elUser.starting_price*elUser.quantity
+          // }
+          // console.log("prova dataaaa: ",new Date().valueOf()-new Date(elUser.yesterday).valueOf()) //86400000 ms in a day!!
+          if (new Date().valueOf()-new Date(elUser.yesterday).valueOf() >= 86400000){
+            elUser.yesterday = new Date()
+            elUser.yesterday_position = elTable.current_value*elUser.quantity-elUser.starting_price*elUser.quantity
+            this.http.put(this.url+'visibility/'+this.user+'/'+elUser.acronym+'.json',elUser).subscribe(
+              (data) => {
+                console.log("updated yesterday position:",data)
+              }
+            )
+            //////////// METTERE LA PUT SULLA CRIPTO DELL'UTENTE (AGGIUNGERE COME CAMPO LA CHIAVE DELL'OGGETTO.)
+          }
           this.dataToDisplay.push({name:elTable.name,
                                   acronym:elTable.acronym,
                                   starting_price:elUser.starting_price,
-                                  starting_price_usd:(elUser.starting_price*elUser.quantity).toFixed(2),
+                                  starting_price_usd:(elUser.starting_price*elUser.quantity).toFixed(3),
                                   quantity:elUser.quantity,
                                   date:elUser.date.substring(0,10),
                                   current_value:elTable.current_value,
-                                  delta_position:0,
+                                  delta_position:(elUser.position-elUser.yesterday_position).toFixed(3),
                                   selling_value:0,
-                                  income:(0*elUser.quantity - elUser.starting_price*elUser.quantity).toFixed(2),
-                                  position:(elTable.current_value*elUser.quantity-elUser.starting_price*elUser.quantity).toFixed(2),
-                                  current_position:(elTable.current_value*elUser.quantity-elUser.starting_price*elUser.quantity).toFixed(2)
+                                  income:(0*elUser.quantity - elUser.starting_price*elUser.quantity).toFixed(3),
+                                  yesterday_position:elTable.current_value,
+                                  position:(elUser.position).toFixed(3),
+                                  current_position:(elTable.current_value*elUser.quantity-elUser.starting_price*elUser.quantity).toFixed(3)
                                 })
         }
       })
