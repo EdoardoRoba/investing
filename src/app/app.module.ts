@@ -34,7 +34,9 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MenuComponent } from './menu/menu.component';
 import { MatMenuModule } from '@angular/material/menu';
 import { HistoryComponent } from './history/history.component';
-import { ChartsModule, WavesModule } from 'angular-bootstrap-md'
+import { WavesModule } from 'angular-bootstrap-md'
+// import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { ChartsModule } from 'ng2-charts';
 
 @NgModule({
   declarations: [
@@ -75,7 +77,7 @@ import { ChartsModule, WavesModule } from 'angular-bootstrap-md'
     MatMenuModule,
     ChartsModule,
     WavesModule
-  ],
+    ],
   providers: [],
   bootstrap: [AppComponent]
 })
