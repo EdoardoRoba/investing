@@ -118,9 +118,11 @@ class Investing():
         # Prints the entire html page
         # print(soup.prettify())
         newValues = pd.DataFrame(columns=["Name","newValue","Delta position"])
+        history = {"date":datetime.now()}
         for c in json_file:
             # print(json_file[c]["href"])
             value = float(soup.find(href=json_file[c]["href"]).get_text().replace('.','').replace(',','.'))
+            history.update({json_file[c]["symbol"]:value})
             # print(value)
             json_file[c]["value"] = value
             json_file[c]["last_update_position"] = (json_file[c]["value"]-json_file[c]["starting_price"])*json_file[c]['quantity']
@@ -130,7 +132,8 @@ class Investing():
                 json_file[c]["yesterday_position"] = json_file[c]["last_update_position"]
                 json_file[c]["yesterday_to_check"] = str(datetime.now())#[:10]
             newValues = newValues.append(pd.DataFrame([[json_file[c]["name"],value,json_file[c]["last_update_position"]-json_file[c]["yesterday_position"]]],columns=["Name","newValue","Delta position"]))
-
+        
+        result = self.firebase.post("/investing/history",history)
         json.dump(json_file,open("cryptos.json",'w'))
         result = self.firebase.put("/investing","cryptos",json_file)
         oldDf = oldDf.drop("Delta position",axis=1).merge(newValues,on=["Name"],how='left')

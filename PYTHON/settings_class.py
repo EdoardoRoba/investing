@@ -41,7 +41,7 @@ class Settings():
         # f_input = input("Insert the frequency: ")
         # f_amount = int(f_input.split(" ")[0])
         # f_type = f_input.split(" ")[1]
-        f_amout = 10
+        f_amount = 10
         f_type = 's'
         return f_amount,f_type
 
