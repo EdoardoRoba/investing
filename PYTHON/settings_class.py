@@ -34,26 +34,31 @@ class Settings():
         resultDF = self.firebase.put("/investing","tables",parsed)
 
     def choose_frequency(self):
-        print("Choose the frequency of the updates.")
-        print("Types of time: s (seconds), m (minutes), h (hours)")
-        print("Examples:\n   - 10 s: every 10 seconds the data will be updated;\n   - 5 m: every 5 minutes the data will be updated;\n   - 3 h: every 3 hours the data will be updated.")
-        print("")
-        f_input = input("Insert the frequency: ")
-        f_amount = int(f_input.split(" ")[0])
-        f_type = f_input.split(" ")[1]
+        # print("Choose the frequency of the updates.")
+        # print("Types of time: s (seconds), m (minutes), h (hours)")
+        # print("Examples:\n   - 10 s: every 10 seconds the data will be updated;\n   - 5 m: every 5 minutes the data will be updated;\n   - 3 h: every 3 hours the data will be updated.")
+        # print("")
+        # f_input = input("Insert the frequency: ")
+        # f_amount = int(f_input.split(" ")[0])
+        # f_type = f_input.split(" ")[1]
+        f_amout = 10
+        f_type = 's'
         return f_amount,f_type
 
     def choose_delta(self):
-        print("Insert the percentage of change you want to be notified for.")
-        print("Examples:\n    - 5: it means that if values change by 5% you will be notified by e-mail;\n    - 25: it means that if values change by 25% you will be notified by e-mail.\n")
-        delta = float(input("Insert the change in percentage: ").replace(" ",""))/100
+        # print("Insert the percentage of change you want to be notified for.")
+        # print("Examples:\n    - 5: it means that if values change by 5% you will be notified by e-mail;\n    - 25: it means that if values change by 25% you will be notified by e-mail.\n")
+        # delta = float(input("Insert the change in percentage: ").replace(" ",""))/100
+        delta = 0.1
         return delta
 
     def add_new_crypto(self,url,headers):
         page = requests.get(url,headers=headers)
         soup = BeautifulSoup(page.content,"html.parser")
 
-        start = input("Do you want to add a new cryptovalue? (y/n) ")
+        # start = input("Do you want to add a new cryptovalue? (y/n) ")
+        start = "n"
+
         existing = json.load(open("cryptos.json"))
         print("\n")
         last_element = max([int(k[1:]) for k in existing.keys()])
