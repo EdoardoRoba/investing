@@ -37,6 +37,7 @@ import { HistoryComponent } from './history/history.component';
 import { WavesModule } from 'angular-bootstrap-md'
 // import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { ChartsModule } from 'ng2-charts';
+import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
   declarations: [
@@ -76,7 +77,8 @@ import { ChartsModule } from 'ng2-charts';
     MatGridListModule,
     MatMenuModule,
     ChartsModule,
-    WavesModule
+    WavesModule,
+    MatSelectModule
     ],
   providers: [],
   bootstrap: [AppComponent]

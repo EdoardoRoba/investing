@@ -15,20 +15,38 @@ import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 export class HistoryComponent implements OnInit {
 
   url = 'https://investing-82e20-default-rtdb.firebaseio.com/investing/'
-  chartDatasets: any //Array<any>=[]
+  filterOnCrypto = ""
+  allCryptos: any[]=[]
 
+  chartDatasets: any //Array<any>=[]
   chartData: any
   chartLabels: any
   chartOptions = {
     responsive: true,
     animation: {
       duration: 0
-    }
+    } //,
+    // scales : {
+    //   yAxes: [{
+    //      ticks: {
+    //         steps : 1000,
+    //         stepValue : 1000,
+    //         max : 45000,
+    //         min: 40000
+    //       }
+    //   }]
+    // }
   };
 
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
+    this.http.get(this.url+'tables.json').subscribe((responseData:any) => {
+      Object.keys(responseData).forEach(element => {
+        this.allCryptos.push({name:responseData[element].name,acronym:responseData[element].acronym})
+      });
+      // console.log("all",this.allCryptos)
+    })
     interval(5000).subscribe(x => {this.getData()})
   }
 
@@ -36,16 +54,38 @@ export class HistoryComponent implements OnInit {
   public chartHovered(e: any): void { }
 
   getData(){
-    this.http.get(this.url+'history.json').subscribe((responseData:any) => {
-      let temp : any[] = []
-      Object.keys(responseData).forEach(element => {
-        temp.push(responseData[element]);
+    // console.log("ehi",this.filterOnCrypto)
+    if (this.filterOnCrypto!==""){
+      this.http.get(this.url+'history.json').subscribe((responseData:any) => {
+        let temp : any[] = []
+        Object.keys(responseData).forEach(element => {
+          temp.push(responseData[element]);
+        });
+        // console.log("temp",temp)
+        let d = new Date()
+        // this.chartData = [{data: temp.map( item => item.BTC ),label:this.filterOnCrypto}]
+        this.chartData = [{data: temp.map( item => {
+          if (d.valueOf()-new Date(item.date).valueOf() < 1800000){ // a month: 2592000000 ms
+            return item[this.filterOnCrypto]
+          } else {
+            return -1
+          }
+        }),label:this.filterOnCrypto}]
+        this.chartData[0]["data"] = this.chartData[0]["data"].filter((el:any)=>el !== -1)
+        // this.chartLabels = [{data: temp.map( item => item.date.replace("T"," ").slice(0,19) ),label:this.filterOnCrypto}]
+        console.log("finished",this.chartData)
+        console.log("crypto",this.filterOnCrypto)
+        this.chartLabels = temp.map(item => {
+          if(d.valueOf()-new Date(item.date).valueOf() < 1800000){ // un'ora e mezza: 4500000
+            return item.date.replace("T"," ").slice(0,19)
+          } else{
+            return -1
+          }
+        })
+        this.chartLabels = this.chartLabels.filter((el:any)=>el !== -1)
+        // chart.update()
       });
-      console.log("finished",temp)
-      this.chartData = [{data: temp.map( item => item.BTC ),label:"BTC"}]
-      this.chartLabels = temp.map( item => item.date.replace("T"," ").slice(0,19) )
-      // chart.update()
-    });
+    }
   }
 
 }
