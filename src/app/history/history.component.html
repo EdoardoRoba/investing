@@ -1,29 +1,13 @@
-<div *ngIf="chartDatasets" style="display: block">
-    <canvas
-        [chartType]="chartType"
-        [datasets]="chartDatasets"
-        [labels]="chartLabels"
-        [colors]="chartColors"
-        [options]="chartOptions"
-        [legend]="true"
-        (chartHover)="chartHovered($event)"
-        (chartClick)="chartClicked($event)">
-    </canvas>
-  </div>
 
-  <!-- <ngx-charts-line-chart
-    [view]="[700,500]"
-    [scheme]="colorScheme"
-    [legend]="legend"
-    [showXAxisLabel]="showXAxisLabel"
-    [showYAxisLabel]="showYAxisLabel"
-    [xAxis]="xAxis"
-    [yAxis]="yAxis"
-    [xAxisLabel]="xAxisLabel"
-    [yAxisLabel]="yAxisLabel"
-    [timeline]="timeline"
-    [results]="multi"
-    (select)="onSelect($event)"
-    (activate)="onActivate($event)"
-    (deactivate)="onDeactivate($event)">
-</ngx-charts-line-chart> -->
+<div style="display: flex;justify-content: center;text-align: center;margin-top: 1rem;" *ngIf="!chartData" class="lds-circle"><div></div></div>
+
+
+<div *ngIf="chartData" style="display: block">
+    <canvas baseChart width="50%" height="20%"
+                [datasets]="chartData"
+                [labels]="chartLabels"
+                [options]="chartOptions"
+                [chartType]="'line'"
+                (chartHover)="chartHovered($event)" 
+                (chartClick)="chartClicked($event)"></canvas>
+  </div>
