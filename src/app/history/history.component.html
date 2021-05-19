@@ -1,13 +1,20 @@
 
 
-<mat-form-field style="display: flex;justify-content: center;text-align: center;margin-top: 1rem;margin-bottom: 2rem;" appearance="fill">
+<mat-form-field style="width: 40%;margin-left: auto;margin-right: auto;display: block;justify-content: center;text-align: center;margin-top: 1rem;" appearance="fill">
     <mat-label>Choose the cryptovalue to plot</mat-label>
     <mat-select [(ngModel)]="filterOnCrypto">
       <mat-option *ngFor="let c of allCryptos" [value]="c.acronym">{{c.name}}</mat-option>
     </mat-select>
-  </mat-form-field>
+</mat-form-field>
 
-<div style="display: flex;justify-content: center;text-align: center;margin-top: 1rem;" *ngIf="((filterOnCrypto.length!==0) && (!chartData))" class="lds-circle"><div></div></div>
+<mat-form-field style="width: 40%;margin-left: auto;margin-right: auto;display: block;justify-content: center;text-align: center;margin-bottom: 2rem;" appearance="fill">
+    <mat-label>Choose the window of dates to plot</mat-label>
+    <mat-select [(ngModel)]="dateWindow">
+      <mat-option *ngFor="let d of datesWindow" [value]="d.value">{{d.label}}</mat-option>
+    </mat-select>
+</mat-form-field>
+
+<div style="display: flex;justify-content: center;text-align: center;margin-top: 1rem;" *ngIf="((filterOnCrypto.length!==0) && (dateWindow!==0) && (!chartData))" class="lds-circle"><div></div></div>
 
 <div *ngIf="chartData" style="display: block">
     <canvas baseChart width="50%" height="20%"

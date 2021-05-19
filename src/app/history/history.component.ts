@@ -17,6 +17,32 @@ export class HistoryComponent implements OnInit {
   url = 'https://investing-82e20-default-rtdb.firebaseio.com/investing/'
   filterOnCrypto = ""
   allCryptos: any[]=[]
+  oneMonth = 2592000000
+
+  datesWindow = [
+    {
+      label: "last hour",
+      value: 3600000
+    },
+    {
+      label: "last 24 hours",
+      value: 86400000
+    },
+    {
+      label: "last two days",
+      value: 172800000
+    },
+    {
+      label: "last week",
+      value: 604800000
+    },
+    {
+      label: "last month",
+      value: 2592000000
+    }
+  ]
+
+  dateWindow = 0
 
   chartDatasets: any //Array<any>=[]
   chartData: any
@@ -47,7 +73,9 @@ export class HistoryComponent implements OnInit {
       });
       // console.log("all",this.allCryptos)
     })
+    
     interval(5000).subscribe(x => {this.getData()})
+    interval(50000).subscribe(x => {this.limitData()})
   }
 
   public chartClicked(e: any): void { }
@@ -65,7 +93,7 @@ export class HistoryComponent implements OnInit {
         let d = new Date()
         // this.chartData = [{data: temp.map( item => item.BTC ),label:this.filterOnCrypto}]
         this.chartData = [{data: temp.map( item => {
-          if (d.valueOf()-new Date(item.date).valueOf() < 1800000){ // a month: 2592000000 ms
+          if (d.valueOf()-new Date(item.date).valueOf() < this.dateWindow){ // a month: 2592000000 ms
             return item[this.filterOnCrypto]
           } else {
             return -1
@@ -73,10 +101,8 @@ export class HistoryComponent implements OnInit {
         }),label:this.filterOnCrypto}]
         this.chartData[0]["data"] = this.chartData[0]["data"].filter((el:any)=>el !== -1)
         // this.chartLabels = [{data: temp.map( item => item.date.replace("T"," ").slice(0,19) ),label:this.filterOnCrypto}]
-        console.log("finished",this.chartData)
-        console.log("crypto",this.filterOnCrypto)
         this.chartLabels = temp.map(item => {
-          if(d.valueOf()-new Date(item.date).valueOf() < 1800000){ // un'ora e mezza: 4500000
+          if(d.valueOf()-new Date(item.date).valueOf() < this.dateWindow){ // un'ora e mezza: 4500000
             return item.date.replace("T"," ").slice(0,19)
           } else{
             return -1
@@ -86,6 +112,19 @@ export class HistoryComponent implements OnInit {
         // chart.update()
       });
     }
+  }
+
+  limitData(){
+    let dataLimited: any[]=[]
+    let d = new Date()
+    this.http.get(this.url+'history.json').subscribe((responseData:any) => {
+      Object.keys(responseData).forEach((element:any) => {
+        if (d.valueOf()-new Date(responseData[element].date).valueOf()<=this.oneMonth){
+          dataLimited.push(responseData[element])
+        }
+      });
+      this.http.put(this.url+'history.json',dataLimited).subscribe()
+    })
   }
 
 }
